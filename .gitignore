@@ -1,0 +1,35 @@
+# ===== Python Virtual Environment =====
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+
+# ===== Python Cache =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyd
+
+# ===== Environment / Secrets =====
+.env
+*.env
+secrets.json
+config.json
+*.key
+*.pem
+
+# ===== Logs =====
+*.log
+
+# ===== OS-specific =====
+.DS_Store
+Thumbs.db
+
+# ===== IDE / Editor =====
+.vscode/
+.idea/
+
+# ===== Other =====
+*.sqlite3
