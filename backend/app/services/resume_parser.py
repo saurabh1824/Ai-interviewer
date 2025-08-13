@@ -1,26 +1,18 @@
 import fitz  # PyMuPDF
-import os
 
-def extract_text_from_pdf(pdf_path):
+async def extract_text_from_pdf(uploaded_file):
     """
-    Extracts text from a PDF file using PyMuPDF.
-    
-    Args:
-        pdf_path (str): The path to the PDF file.
-        
-    Returns:
-        str: The extracted text from the PDF.
+    Extracts text from an uploaded PDF file (UploadFile) using PyMuPDF.
     """
-    if not os.path.exists(pdf_path):
-        raise FileNotFoundError(f"The file {pdf_path} does not exist.")
-    
+    file_bytes = await uploaded_file.read()
     text = ""
-    with fitz.open(pdf_path) as pdf_document:
+
+    # Open from bytes
+    with fitz.open(stream=file_bytes, filetype="pdf") as pdf_document:
         for page in pdf_document:
             text += page.get_text()
-    
+
     return text
 
-text=extract_text_from_pdf("C:\\Users\\HP\\Downloads\\Saurabh Resume pfizer intern.pdf")
 
 # print(text)

@@ -2,9 +2,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 
-# for testing purposes we are importing the resume_parser file
 
-from resume_parser import extract_text_from_pdf
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -13,9 +12,9 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=gemini_api_key)
 
 
-def generate_content(resume_text=""):
+def generate_content(role="",resume_text=""):
     question_prompt = f"""
-    You are an AI interviewer. Your task is to generate 7 or 8 interview questions based on the provided resume text.
+    You are an AI interviewer.you are interviewing an candidate for {role}, Your task is to generate 7 or 8 interview questions based on the provided resume text.
     The questions should be related to question topics that are shown below and should be relevant to candidate's resume.
     The questions should have easy-to-medium difficulty and be open-ended to encourage detailed responses.
 
@@ -54,14 +53,3 @@ def generate_content(resume_text=""):
     return questions
 
 
-
-# Example usage:
-# resume_text = extract_text_from_pdf("path_to_resume.pdf")
-# questions = await generate_content(resume_text)
-# print(questions)
-
-resume_text = extract_text_from_pdf("C:\\Users\\HP\\Downloads\\Saurabh Resume pfizer intern.pdf")
-questions =  generate_content(resume_text)
-
-for i, question in enumerate(questions, start=1):
-    print(f"Question {i}: {question}")

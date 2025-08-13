@@ -1,38 +1,22 @@
-from fastapi import FastAPI 
-from typing import Optional
-from pydantic import BaseModel
-# use HTTPException ,status for raising the error in more structured way 
-class Item(BaseModel):
-    name:str
-    price:int
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from app.api.v1 import interview
 
-app = FastAPI() 
+app = FastAPI(
+    title="AI Interviewer API",
+    version="1.0.0",
+    description="Backend API for AI Interviewer MVP")
 
-store_items ={}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(interview.router,prefix="/api/v1/interview",tags=["interview"])
+
 @app.get("/")
-async def read_root():  
-    return {"message": "Hello, World!"} 
-
-
-
-@app.get("/items/{item_id}")
-async def read_item(item_id: int):
-    if item_id in store_items:
-        item = store_items[item_id]
-        return {"item_id": item_id, "item": item.dict()}
-    return {"message": "Item not found"}
-
-@app.get("/items/")
-async def get_item_byname(name:str):
-    for item_id, item in store_items.items():
-        if item.name == name:
-            return {"item_id": item_id, "item": item.dict()}
-    return {"message": "Item not found with the given name"}
-    
-
-@app.post("/add-items/")
-async def add_items(item_id: int,item:Item):
-    if item_id in store_items:
-        return {"message": "Item already exists"}
-    store_items[item_id] = item
-    return {"message": "Item added successfully", "item_id": item_id, "item": item.dict()}
+async def root():
+    return {"message": "Welcome to the AI Interviewer API"}
