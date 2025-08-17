@@ -5,8 +5,10 @@ from typing import  List
 class interviewRequest(BaseModel):
     role:str
 
-class interviewResponse(BaseModel):
+class InterviewResponse(BaseModel):
+    session_id: str
     questions: List[str]
+    role: str
 
     
 

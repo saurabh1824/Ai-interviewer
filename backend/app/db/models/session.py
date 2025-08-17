@@ -1,11 +1,12 @@
-from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel
+from bson import ObjectId
 
 class InterviewSessionModel(BaseModel):
-    id: str
-    user_id: Optional[str]
+    user_id: Optional[str] = None
     role: str
-    skills: Optional[List[str]]
+    skills: Optional[List[str]] = None
     questions: List[str]
-    created_at: datetime
+    
+    class Config:
+        json_encoders = {ObjectId: str}
