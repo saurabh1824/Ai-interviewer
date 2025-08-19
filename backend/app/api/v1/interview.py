@@ -51,3 +51,15 @@ async def append_answer(session_id: str, answer: Answer):
     if updated_session:
         return updated_session
     return {"error": "Session not found or update failed"}
+
+@router.get("/get_answers/{session_id}")
+async def get_answers(session_id: str):
+    """
+    Retrieve all answers for a given session ID.
+    """
+    from app.db.crud.answers import get_answers_by_session_id
+    answers = await get_answers_by_session_id(session_id=session_id)
+
+    if answers is not None:
+        return {"session_id": session_id, "answers": answers}
+    return {"error": "No answers found for this session ID"}

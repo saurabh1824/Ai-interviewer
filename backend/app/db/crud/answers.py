@@ -25,4 +25,11 @@ async def append_answer(session_id: str, answer: Answer):
         return InterviewAnswerModel.from_mongo(result)  
     return None
 
+async def get_answers_by_session_id(session_id: str):
+    """Retrieve all answers for a given session ID"""
+    result = await db.answers.find_one({"session_id": session_id})
+    if result:
+        return result["answers"]
+    return None
+
 
