@@ -9,3 +9,11 @@ async def create_interview_session(session: InterviewSessionModel):
     result = await db.Sessions.insert_one(session_dict)
     return str(result.inserted_id)
 
+async def get_interview_session_by_id(session_id: str):
+    """
+    Retrieve an interview session by its ID.
+    """
+    session = await db.Sessions.find_one({"_id": session_id})
+    if session:
+        return InterviewSessionModel(**session)
+    return None

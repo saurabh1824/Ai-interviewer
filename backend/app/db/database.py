@@ -6,6 +6,7 @@ import asyncio
 client=AsyncIOMotorClient(settings.mongo_url)
 db = client[settings.mongo_db_name]
 
+
 async def test_connection():
     try:
         # Test the connection by listing collections
