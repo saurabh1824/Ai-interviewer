@@ -4,6 +4,7 @@ from app.db.models.answers import Answer
 from app.db.models.session import InterviewSessionModel
 from app.services import generate_content ,extract_text_from_pdf
 from app.db.crud.session import create_interview_session
+from app.services.audio_answer import process_audio_answer
 
 
 router=APIRouter()
@@ -40,8 +41,8 @@ async def create_answer_instance(session_id: str):
     from app.db.crud.answers import create_answer_object
     return await create_answer_object(session_id=session_id)
 
-@router.post("/submite_answer/{session_id}")
-async def append_answer(session_id: str, answer: Answer):
+@router.post("/submite_answer_text/{session_id}")
+async def submite_answer_text(session_id: str, answer: Answer):
     """
     Append an answer to the existing session.
     """
@@ -63,3 +64,17 @@ async def get_answers(session_id: str):
     if answers is not None:
         return {"session_id": session_id, "answers": answers}
     return {"error": "No answers found for this session ID"}
+
+
+@router.post("/submite_answer_audio/{session_id}")
+async def submite_answer_audio(
+    session_id: str,
+    question_id: int = Form(...),
+    audio_file: UploadFile = File(...)
+):
+    """
+    Process an audio answer for a given session ID.
+    Transcribe the audio and append it to the session's answers.
+    """
+    answer_text= await process_audio_answer(audio_file=audio_file, session_id=session_id, question_id=question_id)
+    return answer_text
