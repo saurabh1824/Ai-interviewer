@@ -8,38 +8,45 @@ from app.services.audio_answer import process_audio_answer
 
 
 router=APIRouter()
-
-@router.post("/start",response_model=InterviewResponse)
-async def start_interview(role:str=File(...),resume: UploadFile = File(...)):
+@router.post("/start", response_model=InterviewResponse)
+async def start_interview(
+    role: str = Form(...),   # should be Form(), not File()
+    resume: UploadFile = File(...)
+):
     """
-    Start an interview :
-    extract text form resume
-    generate interview questions based on the resume text and role.
-    return the questions.
+    Start an interview:
+    1. Extract text from resume
+    2. Generate interview questions
+    3. Create interview session
+    4. Create matching answers instance
+    5. Return session_id + questions
     """
 
+    # 1. Parse resume
     resume_text = await extract_text_from_pdf(resume)
-    questions =  generate_content(role=role, resume_text=resume_text)
 
-    session_data=InterviewSessionModel(
+    # 2. Generate questions
+    questions = generate_content(role=role, resume_text=resume_text)
+
+    # 3. Create session in DB
+    session_data = InterviewSessionModel(
         role=role,
         questions=questions
     )
-
     session_id = await create_interview_session(session_data)
+
+    # 4. Create empty answer doc for this session
+    from app.db.crud.answers import create_answer_object
+    await create_answer_object(session_id=session_id)
+
+    # 5. Return response
     return InterviewResponse(
         session_id=session_id,
         questions=questions,
         role=role
     )
 
-@router.post("/create_answer_instance/{session_id}")
-async def create_answer_instance(session_id: str):
-    """
-    Create a new answer instance for the given session ID.
-    """
-    from app.db.crud.answers import create_answer_object
-    return await create_answer_object(session_id=session_id)
+
 
 @router.post("/submite_answer_text/{session_id}")
 async def submite_answer_text(session_id: str, answer: Answer):
@@ -78,3 +85,35 @@ async def submite_answer_audio(
     """
     answer_text= await process_audio_answer(audio_file=audio_file, session_id=session_id, question_id=question_id)
     return answer_text
+
+
+@router.get("/next_question/{session_id}")
+async def next_question(session_id: str):
+    """
+    Retrieve the next question for the given session ID.
+    """
+    from app.db.crud.session import get_interview_session_by_id
+    session = await get_interview_session_by_id(session_id=session_id)
+
+    if session:
+        if session.current_question_index < len(session.questions):
+            next_question = session.questions[session.current_question_index]
+            return {"next_question": next_question}
+        else:
+            return {"message": "No more questions available. mark session as completed."}
+    return {"error": "Session not found"}
+
+
+@router.post("/end_session/{session_id}")
+async def complete_session(session_id: str):
+    pass
+
+
+@router.get("/evaluate_score/{session_id}")
+async def evaluate_score(session_id: str):
+    """
+    Evaluate the score for the given session ID.
+    This is a placeholder function and should be implemented.
+    """
+    pass
+
