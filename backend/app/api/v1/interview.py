@@ -3,7 +3,7 @@ from app.schemas.interview import interviewRequest,InterviewResponse
 from app.db.models.answers import Answer
 from app.db.models.session import InterviewSessionModel
 from app.services import generate_content ,extract_text_from_pdf
-from app.db.crud.session import create_interview_session
+from app.db.crud.session import create_interview_session ,get_interview_session_by_id 
 from app.services.audio_answer import process_audio_answer
 
 
@@ -106,14 +106,61 @@ async def next_question(session_id: str):
 
 @router.post("/end_session/{session_id}")
 async def complete_session(session_id: str):
-    pass
+    """ mark the satuts of the session as completed by fetching the session by id and updating the status """
+    from app.db.crud.session import update_session_status
+    updated_session = await update_session_status(session_id=session_id, status="completed")
+
+    if updated_session:
+        return {"message": "Session marked as completed", "session_id": session_id}
+    return {"error": "Session not found or update failed"}
 
 
 @router.get("/evaluate_score/{session_id}")
 async def evaluate_score(session_id: str):
     """
     Evaluate the score for the given session ID.
-    This is a placeholder function and should be implemented.
+    and pass the session deatails back to ui for display
+
     """
-    pass
+    from app.db.crud.answers import get_answers_by_session_id
+    from app.services.scoring import evaluate_session
+    from app.db.crud.answers import set_score
+    session = await get_interview_session_by_id(session_id=session_id)
+    answers = await get_answers_by_session_id(session_id=session_id)
+
+    if not session:
+        return {"error": "Session not found"}
+    
+    if not answers:
+        
+        return {"error": "No answers found for this session"}
+
+    # if not session or answers is None:
+    #     return {"error": " api block Session or answers not found"}
+
+    # Build dict {question_text: answer_text}
+    QA_pairs = {}
+
+    for idx, qtext in enumerate(session.questions, start=1):  # 1-based indexing
+        ans_obj = next((a for a in answers if a["question_id"] == idx), None)
+        answer_text = ans_obj["answer_text"] if ans_obj else "Not answered"
+        QA_pairs[qtext] = answer_text
+
+    # Pass to Gemini evaluator
+    score_details = await evaluate_session(QA_pairs)
+
+    # Update session with score
+    status =await set_score(session_id=session_id, score=score_details["score"])
+    if not status:
+        return {"error": "Failed to update score in session"}
+    
+    return {
+        "session_id": session_id,
+        "role": session.role,
+        "score": score_details["score"],
+        "feedback": score_details["feedback"],
+        "qa_pairs": QA_pairs
+    }
+
+    
 
