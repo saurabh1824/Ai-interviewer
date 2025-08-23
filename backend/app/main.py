@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import interview
-
+from app.api.v1 import auth
 app = FastAPI(
     title="AI Interviewer API",
     version="1.0.0",
@@ -16,6 +16,7 @@ app.add_middleware(
 )
 
 app.include_router(interview.router,prefix="/api/v1/interview",tags=["interview"])
+app.include_router(auth.router,prefix="/api/v1/auth",tags=["auth"])
 
 @app.get("/")
 async def root():

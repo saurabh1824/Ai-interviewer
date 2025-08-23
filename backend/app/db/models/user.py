@@ -1,12 +1,12 @@
 from pydantic import BaseModel, EmailStr
-from typing import List,Optional
-from datetime import datetime
+from typing import Optional
 
-class User(BaseModel):
-    id: str
-    name: str
+class UserModel(BaseModel):
     email: EmailStr
-    created_at: datetime
+    hashed_password: str
+    full_name: Optional[str] = None
+    role: str = "candidate"
+
 
 
     
