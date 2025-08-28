@@ -1,17 +1,18 @@
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, UploadFile, File, Form, Depends
 from app.schemas.interview import interviewRequest,InterviewResponse
 from app.db.models.answers import Answer
 from app.db.models.session import InterviewSessionModel
 from app.services import generate_content ,extract_text_from_pdf
 from app.db.crud.session import create_interview_session ,get_interview_session_by_id 
 from app.services.audio_answer import process_audio_answer
-
+from app.core.security import get_current_user
 
 router=APIRouter()
 @router.post("/start", response_model=InterviewResponse)
 async def start_interview(
     role: str = Form(...),   # should be Form(), not File()
-    resume: UploadFile = File(...)
+    resume: UploadFile = File(...),
+   current_user: dict = Depends(get_current_user)
 ):
     """
     Start an interview:
@@ -21,6 +22,8 @@ async def start_interview(
     4. Create matching answers instance
     5. Return session_id + questions
     """
+    # get user id from token then create session for that user
+    
 
     # 1. Parse resume
     resume_text = await extract_text_from_pdf(resume)
@@ -30,6 +33,7 @@ async def start_interview(
 
     # 3. Create session in DB
     session_data = InterviewSessionModel(
+        user_id=str(current_user["_id"]),
         role=role,
         questions=questions
     )
@@ -105,8 +109,9 @@ async def next_question(session_id: str):
 
 
 @router.post("/end_session/{session_id}")
-async def complete_session(session_id: str):
+async def complete_session(session_id: str,current_user: dict = Depends(get_current_user)):
     """ mark the satuts of the session as completed by fetching the session by id and updating the status """
+
     from app.db.crud.session import update_session_status
     updated_session = await update_session_status(session_id=session_id, status="completed")
 
@@ -116,7 +121,7 @@ async def complete_session(session_id: str):
 
 
 @router.get("/evaluate_score/{session_id}")
-async def evaluate_score(session_id: str):
+async def evaluate_score(session_id: str , current_user: dict = Depends(get_current_user)):
     """
     Evaluate the score for the given session ID.
     and pass the session deatails back to ui for display
@@ -127,6 +132,8 @@ async def evaluate_score(session_id: str):
     from app.db.crud.answers import set_score
     session = await get_interview_session_by_id(session_id=session_id)
     answers = await get_answers_by_session_id(session_id=session_id)
+
+     # Check if session and answers exist
 
     if not session:
         return {"error": "Session not found"}
