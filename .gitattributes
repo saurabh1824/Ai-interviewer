@@ -1,0 +1,35 @@
+# ================================
+# Enforce LF line endings (safe for Linux/servers)
+# ================================
+* text=auto eol=lf
+
+# ================================
+# Frontend (React + Tailwind + Vite)
+# ================================
+*.js   text eol=lf
+*.jsx  text eol=lf
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+
+# ================================
+# Backend (FastAPI + Python)
+# ================================
+*.py   text eol=lf
+*.env  text eol=lf
+*.ini  text eol=lf
+*.cfg  text eol=lf
+*.toml text eol=lf
+
+# ================================
+# Other project files
+# ================================
+*.sh   text eol=lf
+*.dockerfile text eol=lf
+*.gitignore text eol=lf
+
