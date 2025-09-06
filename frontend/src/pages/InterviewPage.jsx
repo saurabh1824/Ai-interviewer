@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, analyseComplexValue } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import InterviewForm from '../components/InterviewForm';
@@ -8,56 +8,71 @@ import VideoDisplay from '../components/VideoDisplay';
 import TextEditor from '../components/TextEditor';
 import Button from '../components/Button';
 import { Mic, SkipForward, X, MessageSquare } from 'lucide-react';
+import { getNextQuestion, startInterview } from "../services/interview";
 
 const InterviewPage = () => {
   const [showForm, setShowForm] = useState(true);
   const [showTextEditor, setShowTextEditor] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
   const navigate = useNavigate();
 
-  const sampleQuestions = [
-    "Hello! Welcome to your mock interview. Can you tell me about yourself and your background?",
-    "What interests you most about this role and our company?",
-    "Can you walk me through a challenging project you've worked on recently?",
-    "How do you handle tight deadlines and pressure in your work?"
-  ];
 
-  const handleFormSubmit = (data) => {
-    setShowForm(false);
-    
-    // Simulate AI interviewer starting
-    setTimeout(() => {
-      setMessages([{ text: sampleQuestions[0], isTyping: false }]);
-    }, 1000);
+  const handleFormSubmit = async ({role , resume}) => {
+    try {
+      setShowForm(false);
+
+      const session = await startInterview(role,resume);
+
+      // Save session info (session_id + questions)
+      setSessionId(session.session_id)
+      
+      const q= await getNextQuestion(session.session_id)
+      setCurrentQuestion(q.next_question)
+      setMessages([{text:q.next_question ,isTyping:false}]);
+      setShowForm(false);
+
+
+      // You could also keep session_id in state/context
+      console.log("Session started:", session);
+
+    } catch (err) {
+      alert(err.message || "Could not start interview");
+      setShowForm(true);
+    }
   };
 
-  const handleTextSubmit = (text) => {
+  const fetchNext= async ()=>{
+    const q = await getNextQuestion(sessionId)
+
+    if(q.next_question){
+      setCurrentQuestion(q.next_question);
+      setMessages(prev=>[...prev , {text:q.next_question ,isTyping:false}]);
+    }else{
+      navigate("/evaluation");
+    }
+  }
+
+  const handleTextSubmit = async (text) => {
     // Add user's answer (you could display this if needed)
     
     // Move to next question
-    setTimeout(() => {
-      if (currentQuestion < sampleQuestions.length - 1) {
-        const nextQuestion = currentQuestion + 1;
-        setCurrentQuestion(nextQuestion);
-        setMessages(prev => [...prev, { text: sampleQuestions[nextQuestion], isTyping: false }]);
-      } else {
-        // Interview completed
-        navigate('/evaluation');
-      }
-    }, 1000);
+      await fetchNext();
+      setShowTextEditor(false);
     
     setShowTextEditor(false);
   };
 
-  const handleSkipQuestion = () => {
-    if (currentQuestion < sampleQuestions.length - 1) {
-      const nextQuestion = currentQuestion + 1;
-      setCurrentQuestion(nextQuestion);
-      setMessages(prev => [...prev, { text: sampleQuestions[nextQuestion], isTyping: false }]);
-    } else {
-      navigate('/evaluation');
-    }
+  const handleSkipQuestion = async() => {
+    // if (currentQuestion < sampleQuestions.length - 1) {
+    //   const nextQuestion = currentQuestion + 1;
+    //   setCurrentQuestion(nextQuestion);
+    //   setMessages(prev => [...prev, { text: sampleQuestions[nextQuestion], isTyping: false }]);
+    // } else {
+    //   navigate('/evaluation');
+    // }
+    await fetchNext();
   };
 
   const handleEndInterview = () => {

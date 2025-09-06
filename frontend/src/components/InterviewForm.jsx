@@ -21,7 +21,7 @@ const InterviewForm = ({ onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (name && role) {
-      onSubmit({ name, role, resume });
+      onSubmit({role, resume });
     }
   };
 

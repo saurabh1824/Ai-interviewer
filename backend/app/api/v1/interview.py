@@ -11,7 +11,7 @@ router=APIRouter()
 @router.post("/start", response_model=InterviewResponse)
 async def start_interview(
     role: str = Form(...),   # should be Form(), not File()
-    resume: UploadFile = File(...),
+    resume: UploadFile| None=File(None),
    current_user: dict = Depends(get_current_user)
 ):
     """
@@ -97,11 +97,16 @@ async def next_question(session_id: str):
     Retrieve the next question for the given session ID.
     """
     from app.db.crud.session import get_interview_session_by_id
+    from app.db.crud.session import update_current_question_index
     session = await get_interview_session_by_id(session_id=session_id)
 
     if session:
         if session.current_question_index < len(session.questions):
             next_question = session.questions[session.current_question_index]
+            result=await update_current_question_index(session_id=session_id)
+            print(f"updated index status {result}")
+            print(next_question)
+            
             return {"next_question": next_question}
         else:
             return {"message": "No more questions available. mark session as completed."}

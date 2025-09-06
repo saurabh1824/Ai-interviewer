@@ -5,7 +5,7 @@ export function getAuthHeaders() {
   if (!token) throw new Error("No token found, please login first");
   return {
     Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
+    
   };
 }
 
