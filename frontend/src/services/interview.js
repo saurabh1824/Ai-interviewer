@@ -28,3 +28,22 @@ export async function getNextQuestion(sessionId){
   }
   return response.json()
 }
+
+export async function submitTextAnswer(answerObj ,sessionId){
+
+  const response =await fetch(`${API_BASE}/interview/submite_answer_text/${sessionId}`,{
+    method:"POST",
+    headers:{
+      ...getAuthHeaders(),
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify(answerObj)
+  });
+
+  if(!response){
+    throw new Error("failed to submit text answer");
+  }
+
+  return response.json()
+  
+}

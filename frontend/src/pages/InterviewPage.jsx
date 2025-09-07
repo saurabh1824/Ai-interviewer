@@ -8,13 +8,14 @@ import VideoDisplay from '../components/VideoDisplay';
 import TextEditor from '../components/TextEditor';
 import Button from '../components/Button';
 import { Mic, SkipForward, X, MessageSquare } from 'lucide-react';
-import { getNextQuestion, startInterview } from "../services/interview";
+import { getNextQuestion, startInterview ,submitTextAnswer } from "../services/interview";
 
 const InterviewPage = () => {
   const [showForm, setShowForm] = useState(true);
   const [showTextEditor, setShowTextEditor] = useState(false);
   const [messages, setMessages] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [currentQuestionIndex ,setCurrentQuestionIndex]=useState(0)
   const [sessionId, setSessionId] = useState(null);
   const navigate = useNavigate();
 
@@ -30,6 +31,7 @@ const InterviewPage = () => {
       
       const q= await getNextQuestion(session.session_id)
       setCurrentQuestion(q.next_question)
+      setCurrentQuestionIndex(q.question_id)
       setMessages([{text:q.next_question ,isTyping:false}]);
       setShowForm(false);
 
@@ -48,6 +50,7 @@ const InterviewPage = () => {
 
     if(q.next_question){
       setCurrentQuestion(q.next_question);
+      setCurrentQuestionIndex(q.question_id)
       setMessages(prev=>[...prev , {text:q.next_question ,isTyping:false}]);
     }else{
       navigate("/evaluation");
@@ -56,22 +59,33 @@ const InterviewPage = () => {
 
   const handleTextSubmit = async (text) => {
     // Add user's answer (you could display this if needed)
+
+    const answerObj={
+      "question_id":currentQuestionIndex,
+      "answer_type":"text",
+      "answer_text":text
+    }
+
+    const result = await submitTextAnswer(answerObj,sessionId)
+
+    console.log(answerObj);
     
+ 
     // Move to next question
-      await fetchNext();
-      setShowTextEditor(false);
-    
+    await fetchNext();
     setShowTextEditor(false);
+    
   };
 
   const handleSkipQuestion = async() => {
-    // if (currentQuestion < sampleQuestions.length - 1) {
-    //   const nextQuestion = currentQuestion + 1;
-    //   setCurrentQuestion(nextQuestion);
-    //   setMessages(prev => [...prev, { text: sampleQuestions[nextQuestion], isTyping: false }]);
-    // } else {
-    //   navigate('/evaluation');
-    // }
+
+    const answerObj={
+      "question_id":currentQuestionIndex,
+      "answer_type":"text",
+      "answer_text":"QUESTION_NOT_ANSWERED"
+    }
+    console.log(answerObj);
+    const result = await submitTextAnswer(answerObj,sessionId)
     await fetchNext();
   };
 
