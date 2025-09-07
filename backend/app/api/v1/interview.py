@@ -77,7 +77,7 @@ async def get_answers(session_id: str):
     return {"error": "No answers found for this session ID"}
 
 
-@router.post("/submite_answer_audio/{session_id}")
+@router.post("/submit_answer_audio/{session_id}")
 async def submite_answer_audio(
     session_id: str,
     question_id: int = Form(...),
@@ -97,17 +97,17 @@ async def next_question(session_id: str):
     Retrieve the next question for the given session ID.
     """
     from app.db.crud.session import get_interview_session_by_id
-    from app.db.crud.session import update_current_question_index
+    # from app.db.crud.session import update_current_question_index
     session = await get_interview_session_by_id(session_id=session_id)
 
     if session:
         if session.current_question_index < len(session.questions):
             next_question = session.questions[session.current_question_index]
-            result=await update_current_question_index(session_id=session_id)
-            print(f"updated index status {result}")
-            print(next_question)
+            # result=await update_current_question_index(session_id=session_id)
+            # print(f"updated index status {result}")
+            # print(next_question)
             
-            return {"next_question": next_question}
+            return {"next_question": next_question ,"question_id":session.current_question_index}
         else:
             return {"message": "No more questions available. mark session as completed."}
     return {"error": "Session not found"}

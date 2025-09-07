@@ -29,13 +29,3 @@ async def update_session_status(session_id: str, status: str):
         return InterviewSessionModel(**result)
     return None
 
-
-async def update_current_question_index(session_id:str):
-    """get the session by Id and then update the current question index"""
-
-    result= await db.Sessions.find_one_and_update({"_id":ObjectId(session_id)},
-                                                {"$inc":{"current_question_index":1}})
-    
-    if(result):
-        return "index incremented by 1"
-    return None

@@ -1,6 +1,7 @@
 from app.db.models.answers import InterviewAnswerModel ,Answer
 from app.db.database import db
 from pymongo import ReturnDocument
+from bson import ObjectId 
 
 
 async def create_answer_object(session_id: str):
@@ -22,7 +23,7 @@ async def append_answer(session_id: str, answer: Answer):
     )
 
     await db.Sessions.update_one(
-        {"_id": session_id},
+        {"_id": ObjectId(session_id)},
         {"$inc": {"current_question_index": 1}}
     )
 
