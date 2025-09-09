@@ -1,7 +1,6 @@
 from app.db.models.session import InterviewSessionModel
 from app.db.database import db
 from bson import ObjectId 
-
 async def create_interview_session(session: InterviewSessionModel):
     """
     Create a new interview session in the database.
@@ -23,9 +22,12 @@ async def update_session_status(session_id: str, status: str):
     """
     Update the status of an interview session.
     """
-    result = await db.Sessions.find_one_and_update({"_id": ObjectId(session_id)},
-                                                   {"$set": {"status":status}},)
-    if result:
-        return InterviewSessionModel(**result)
-    return None
+    result = await db.Sessions.find_one_and_update(
+        {"_id": ObjectId(session_id)},
+        {"$set": {"status": status}},
+        return_document=True
+    )
 
+    if result:
+        return InterviewSessionModel.from_mongo(result) 
+    return None

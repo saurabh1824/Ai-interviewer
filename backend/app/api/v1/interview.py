@@ -122,7 +122,7 @@ async def complete_session(session_id: str,current_user: dict = Depends(get_curr
 
     if updated_session:
         return {"message": "Session marked as completed", "session_id": session_id}
-    return {"error": "Session not found or update failed"}
+    return {"message": "Session not found or update failed"}
 
 
 @router.get("/evaluate_score/{session_id}")
