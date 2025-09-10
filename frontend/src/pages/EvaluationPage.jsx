@@ -5,13 +5,14 @@ import Navigation from '../components/Navigation';
 import CircularScore from '../components/CircularScore';
 import Button from '../components/Button';
 import { RotateCcw, Clock, Target, MessageSquare } from 'lucide-react';
+import { useSession } from "../context/SessionContext";
 
 const EvaluationPage = () => {
   const navigate = useNavigate();
+  const { session } = useSession();
 
   const sessionData = {
-    role: 'Frontend Developer',
-    questionsAsked: 4,
+
     totalScore: 78,
     duration: '12 min 30 sec'
   };
@@ -58,7 +59,7 @@ const EvaluationPage = () => {
                   <Target className="h-5 w-5 text-blue-600" />
                   <div>
                     <p className="text-sm text-gray-400">Role</p>
-                    <p className="font-semibold text-white">{sessionData.role}</p>
+                    <p className="font-semibold text-white">{session.role}</p>
                   </div>
                 </div>
                 
@@ -66,7 +67,7 @@ const EvaluationPage = () => {
                   <MessageSquare className="h-5 w-5 text-blue-600" />
                   <div>
                     <p className="text-sm text-gray-400">Questions Asked</p>
-                    <p className="font-semibold text-white">{sessionData.questionsAsked}</p>
+                    <p className="font-semibold text-white">{session.totalQuestions}</p>
                   </div>
                 </div>
                 

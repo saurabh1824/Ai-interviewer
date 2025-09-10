@@ -7,8 +7,9 @@ import ChatBubble from '../components/ChatBubble';
 import VideoDisplay from '../components/VideoDisplay';
 import TextEditor from '../components/TextEditor';
 import Button from '../components/Button';
+import { useSession } from "../context/SessionContext";
 import { Mic, SkipForward, X, MessageSquare } from 'lucide-react';
-import { getNextQuestion, startInterview ,submitTextAnswer } from "../services/interview";
+import { getNextQuestion, startInterview ,submitTextAnswer ,endSession } from "../services/interview";
 
 const InterviewPage = () => {
   const [showForm, setShowForm] = useState(true);
@@ -16,18 +17,27 @@ const InterviewPage = () => {
   const [messages, setMessages] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentQuestionIndex ,setCurrentQuestionIndex]=useState(0)
-  const [sessionId, setSessionId] = useState(null);
+  // const [sessionId, setSessionId] = useState(null);
   const navigate = useNavigate();
+  const { session,setSession } = useSession();
 
 
-  const handleFormSubmit = async ({role , resume}) => {
+  const handleFormSubmit = async ({role , resume ,name}) => {
+    
     try {
       setShowForm(false);
 
       const session = await startInterview(role,resume);
 
-      // Save session info (session_id + questions)
-      setSessionId(session.session_id)
+      // Store full session in context
+      setSession({
+        sessionId: session.session_id,
+        fullName: name,
+        role,
+        questions: session.questions || [],
+        totalQuestions: session.questions?.length || 0,
+        status: "in_progress",
+      });
       
       const q= await getNextQuestion(session.session_id)
       setCurrentQuestion(q.next_question)
@@ -46,14 +56,14 @@ const InterviewPage = () => {
   };
 
   const fetchNext= async ()=>{
-    const q = await getNextQuestion(sessionId)
+    const q = await getNextQuestion(session.sessionId)
 
     if(q.next_question){
       setCurrentQuestion(q.next_question);
       setCurrentQuestionIndex(q.question_id)
       setMessages(prev=>[...prev , {text:q.next_question ,isTyping:false}]);
     }else{
-      navigate("/evaluation");
+      handleEndInterview();
     }
   }
 
@@ -66,7 +76,7 @@ const InterviewPage = () => {
       "answer_text":text
     }
 
-    const result = await submitTextAnswer(answerObj,sessionId)
+    await submitTextAnswer(answerObj,session.sessionId)
 
     console.log(answerObj);
     
@@ -85,12 +95,20 @@ const InterviewPage = () => {
       "answer_text":"QUESTION_NOT_ANSWERED"
     }
     console.log(answerObj);
-    const result = await submitTextAnswer(answerObj,sessionId)
+    await submitTextAnswer(answerObj,session.sessionId)
     await fetchNext();
   };
 
-  const handleEndInterview = () => {
-    navigate('/evaluation');
+  const handleEndInterview = async () => {
+
+    const response= await endSession(session.sessionId) 
+
+    if (response.message==="Session marked as completed"){
+      alert(response.message)
+      navigate('/evaluation');
+    }else{
+      alert(response.message)
+    }
   };
 
   return (

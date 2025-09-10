@@ -47,3 +47,18 @@ export async function submitTextAnswer(answerObj ,sessionId){
   return response.json()
   
 }
+
+export async function endSession(sessionId){
+
+  
+  const response = await fetch(`${API_BASE}/interview/end_session/${sessionId}`,{
+    method:"POST",
+    headers:getAuthHeaders()
+  });
+
+  if(!response){
+    throw new Error("failed to end session"); 
+  }
+
+  return response.json()
+}
