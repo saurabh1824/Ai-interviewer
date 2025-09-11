@@ -9,6 +9,10 @@ const defaultSession = {
   totalQuestions: 0,
   status: "in_progress",
   score: null,
+  feedback: "",
+  strengths: [],
+  areasForImprovement: [],
+  duration: "20 min "
 };
 
 const SessionContext = createContext({

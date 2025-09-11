@@ -1,4 +1,4 @@
-import React from 'react';
+import {useEffect} from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
@@ -6,36 +6,48 @@ import CircularScore from '../components/CircularScore';
 import Button from '../components/Button';
 import { RotateCcw, Clock, Target, MessageSquare } from 'lucide-react';
 import { useSession } from "../context/SessionContext";
+import { evaluateSession } from '../services/interview';
 
 const EvaluationPage = () => {
   const navigate = useNavigate();
-  const { session } = useSession();
+  const { session ,setSession } = useSession();
 
-  const sessionData = {
+  useEffect(()=>{
+    const fetchEvaluation= async ()=>{
+      try{
+        const data= await evaluateSession(session.sessionId)
+        console.log(data);
+        
+        setSession({
+          score:data.score,
+          feedback:data.feedback,
+          strengths:data.strengths || [],
+          areasForImprovment:data.areas_for_improvement || [],
+          duration:data.duration || null
+        });
+      }catch(err){
+        console.error(err);
+      }
+    }
 
-    totalScore: 78,
-    duration: '12 min 30 sec'
-  };
+    if (session.sessionId){
+      fetchEvaluation();
+    }
+  },[session.sessionId]);
 
-  const feedback = [
+
+    // transform into the "sections" expected by UI
+  const feedbackSections = [
     {
-      category: 'Strengths',
-      points: [
-        'Excellent communication skills and clear explanations',
-        'Strong understanding of React and modern web technologies',
-        'Good problem-solving approach with logical thinking'
-      ],
-      color: 'green'
+      category: "Strengths",
+      points: session.strengths || [],
+      color: "green",
     },
     {
-      category: 'Areas for Improvement',
-      points: [
-        'Could provide more specific examples from past projects',
-        'Consider discussing performance optimization techniques',
-        'Practice explaining complex concepts in simpler terms'
-      ],
-      color: 'yellow'
-    }
+      category: "Areas for Improvement",
+      points: session.areasForImprovement || [],
+      color: "yellow",
+    },
   ];
 
   return (
@@ -75,7 +87,7 @@ const EvaluationPage = () => {
                   <Clock className="h-5 w-5 text-blue-600" />
                   <div>
                     <p className="text-sm text-gray-400">Duration</p>
-                    <p className="font-semibold text-white">{sessionData.duration}</p>
+                    <p className="font-semibold text-white">{session.duration}</p>
                   </div>
                 </div>
               </div>
@@ -84,7 +96,7 @@ const EvaluationPage = () => {
             {/* Circular Score Display */}
             <div className="bg-gray-800 rounded-2xl shadow-lg p-6">
               <div className="flex justify-center">
-                <CircularScore score={sessionData.totalScore} maxScore={100} size={140} />
+                <CircularScore score={session.score} maxScore={50} size={140} />
               </div>
             </div>
 
@@ -108,7 +120,7 @@ const EvaluationPage = () => {
               <h2 className="text-xl font-bold text-white mb-6">Interview Feedback</h2>
               
               <div className="space-y-6">
-                {feedback.map((section, index) => (
+                {feedbackSections.map((section, index) => (
                   <motion.div
                     key={section.category}
                     initial={{ opacity: 0, x: -20 }}

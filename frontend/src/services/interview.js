@@ -62,3 +62,18 @@ export async function endSession(sessionId){
 
   return response.json()
 }
+
+export async function evaluateSession(sessionId){
+
+  const response = await fetch(`${API_BASE}/interview/evaluate_score/${sessionId}`,{
+    method:"GET",
+    headers:getAuthHeaders()
+  })
+
+  if(!response){
+    throw new Error("failed to get evaluate session"); 
+  }
+
+  return response.json()
+  
+}

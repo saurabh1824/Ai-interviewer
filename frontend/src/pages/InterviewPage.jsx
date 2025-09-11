@@ -17,7 +17,6 @@ const InterviewPage = () => {
   const [messages, setMessages] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentQuestionIndex ,setCurrentQuestionIndex]=useState(0)
-  // const [sessionId, setSessionId] = useState(null);
   const navigate = useNavigate();
   const { session,setSession } = useSession();
 

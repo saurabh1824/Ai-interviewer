@@ -12,7 +12,7 @@ const Hero = () => {
   ];
 
   return (
-    <div className="relative bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-20">
+    <div className="relative bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-20 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <motion.h1 
