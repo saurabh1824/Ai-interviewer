@@ -10,7 +10,7 @@ from app.core.security import get_current_user
 router=APIRouter()
 @router.post("/start", response_model=InterviewResponse)
 async def start_interview(
-    role: str = Form(...),   # should be Form(), not File()
+    role: str = Form(...),
     resume: UploadFile| None=File(None),
    current_user: dict = Depends(get_current_user)
 ):
@@ -144,13 +144,8 @@ async def evaluate_score(session_id: str , current_user: dict = Depends(get_curr
         return {"error": "Session not found"}
     
     if not answers:
-        
         return {"error": "No answers found for this session"}
 
-    # if not session or answers is None:
-    #     return {"error": " api block Session or answers not found"}
-
-    # Build dict {question_text: answer_text}
     QA_pairs = {}
 
     for idx, qtext in enumerate(session.questions, start=1):  # 1-based indexing
@@ -159,20 +154,17 @@ async def evaluate_score(session_id: str , current_user: dict = Depends(get_curr
         QA_pairs[qtext] = answer_text
 
     # Pass to Gemini evaluator
-    score_details = await evaluate_session(QA_pairs)
+    evaluation_data = await evaluate_session(QA_pairs)
 
     # Update session with score
-    status =await set_score(session_id=session_id, score=score_details["score"])
+    status =await set_score(session_id=session_id, score=evaluation_data["score"])
     if not status:
         return {"error": "Failed to update score in session"}
     
-    return {
-        "session_id": session_id,
-        "role": session.role,
-        "score": score_details["score"],
-        "feedback": score_details["feedback"],
-        "qa_pairs": QA_pairs
-    }
+    print("evaluation_data-----------------------------------------------------")
+    print(evaluation_data)
+    return evaluation_data
+
 
     
 

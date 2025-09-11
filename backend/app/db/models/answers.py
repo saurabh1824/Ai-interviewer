@@ -38,8 +38,8 @@ class InterviewAnswerModel(BaseModel):
                                 description="List of answers provided during the interview")
     score: Optional[float] = Field(None,
                                  ge=0,
-                                 le=5,
-                                 description="Score of the interview (0-5 scale)")
+                                 le=50,
+                                 description="Score of the interview (0-50 scale)")
 
     model_config = ConfigDict(
         populate_by_name=True,
