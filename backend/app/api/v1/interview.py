@@ -103,10 +103,7 @@ async def next_question(session_id: str):
     if session:
         if session.current_question_index < len(session.questions):
             next_question = session.questions[session.current_question_index]
-            # result=await update_current_question_index(session_id=session_id)
-            # print(f"updated index status {result}")
-            # print(next_question)
-            
+             
             return {"next_question": next_question ,"question_id":session.current_question_index}
         else:
             return {"message": "No more questions available. mark session as completed."}
@@ -161,8 +158,6 @@ async def evaluate_score(session_id: str , current_user: dict = Depends(get_curr
     if not status:
         return {"error": "Failed to update score in session"}
     
-    print("evaluation_data-----------------------------------------------------")
-    print(evaluation_data)
     return evaluation_data
 
 

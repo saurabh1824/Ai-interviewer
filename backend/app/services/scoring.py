@@ -59,8 +59,6 @@ async def evaluate_session(session_details: dict) -> dict:
 
             try:
                 parsed = json.loads(match.group())
-                print("scoring.py data...............................................")
-                print(parsed)
             except json.JSONDecodeError:
                 raise ValueError(f"Could not parse JSON: {evaluation_text}")
             
