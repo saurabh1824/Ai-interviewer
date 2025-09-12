@@ -16,14 +16,13 @@ const EvaluationPage = () => {
     const fetchEvaluation= async ()=>{
       try{
         const data= await evaluateSession(session.sessionId)
-        console.log(data);
         
         setSession({
-          score:data.score,
-          feedback:data.feedback,
-          strengths:data.strengths || [],
-          areasForImprovment:data.areas_for_improvement || [],
-          duration:data.duration || null
+          score: data.score,
+          feedback: data.feedback,
+          strengths: Array.isArray(data.strengths) ? data.strengths : [],
+          areasForImprovement: Array.isArray(data.areas_for_improvement) ? data.areas_for_improvement : [],
+          duration: data.duration || null
         });
       }catch(err){
         console.error(err);
@@ -45,7 +44,7 @@ const EvaluationPage = () => {
     },
     {
       category: "Areas for Improvement",
-      points: session.areasForImprovement || [],
+      points: session.areasForImprovement || [], 
       color: "yellow",
     },
   ];
@@ -149,11 +148,8 @@ const EvaluationPage = () => {
 
             {/* Additional Insights */}
             <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl p-6 border border-blue-800">
-              <h3 className="font-semibold text-white mb-3">Next Steps</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Based on your performance, consider practicing more technical questions and 
-                preparing specific examples from your projects. Focus on articulating your 
-                thought process clearly and asking thoughtful questions about the role.
+              <h3 className="font-semibold text-white mb-3">Session Summary</h3>
+              <p className="text-gray-300 leading-relaxed">{session.feedback || "Thank you for completing the interview. Based on your performance, we recommend focusing on the areas highlighted above. Consider practicing with mock interviews and reviewing common questions for your target role. Good luck!"}
               </p>
             </div>
           </div>
