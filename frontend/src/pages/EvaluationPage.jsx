@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect ,useState} from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
@@ -11,32 +11,46 @@ import { evaluateSession } from '../services/interview';
 const EvaluationPage = () => {
   const navigate = useNavigate();
   const { session ,setSession } = useSession();
+  const [callLimit, setCallLimit] = useState(0);
 
   useEffect(()=>{
     const fetchEvaluation= async ()=>{
       try{
-        const data= await evaluateSession(session.sessionId)
-        
+        const data=undefined;
+        if (callLimitReached <=1)
+        {
+          data=await evaluateSession(session.sessionId)
+          setCallLimit(callLimit + 1);
+        }
+    
+        // console.log("Evaluation data:", data);
         setSession({
+          status: "completed",
           score: data.score,
-          feedback: data.feedback,
-          strengths: Array.isArray(data.strengths) ? data.strengths : [],
-          areasForImprovement: Array.isArray(data.areas_for_improvement) ? data.areas_for_improvement : [],
-          duration: data.duration || null
+          feedback: data.feedback || session.feedback,
+          strengths: Array.isArray(data.strengths) && data.strengths.length > 0 ? data.strengths : session.strengths,
+          areasForImprovement: Array.isArray(data.areas_for_improvement) && data.areas_for_improvement.length > 0 ? data.areas_for_improvement : session.areasForImprovement,
+          duration: data.duration || session.duration
         });
       }catch(err){
         console.error(err);
       }
     }
 
-    if (session.sessionId){
+ 
+    if (session.sessionId)
+    {
       fetchEvaluation();
     }
-  },[session.sessionId]);
 
+},[session.sessionId]);
 
-    // transform into the "sections" expected by UI
-  const feedbackSections = [
+useEffect(() => {
+  console.log("Session in  evaluation block:", session);
+}, [session]);
+
+  // transform into the "sections" expected by UI
+const feedbackSections = [
     {
       category: "Strengths",
       points: session.strengths || [],

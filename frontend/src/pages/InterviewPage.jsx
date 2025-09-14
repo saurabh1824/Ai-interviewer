@@ -98,17 +98,21 @@ const InterviewPage = () => {
     await fetchNext();
   };
 
-  const handleEndInterview = async () => {
+const handleEndInterview = async () => {
+  try {
+    const response = await endSession(session.sessionId);
 
-    const response= await endSession(session.sessionId) 
-
-    if (response.message==="Session marked as completed"){
-      alert(response.message)
+    if (response.message === "Session marked as completed") {
       navigate('/evaluation');
-    }else{
-      alert(response.message)
+    } else {
+      alert(response.message);
     }
-  };
+  } catch (err) {
+    console.error("Error ending session:", err);
+  }
+};
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
