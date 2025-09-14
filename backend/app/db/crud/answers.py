@@ -35,7 +35,7 @@ async def get_answers_by_session_id(session_id: str):
     """Retrieve all answers for a given session ID"""
     result = await db.Answers.find_one({"session_id": session_id})
     if result:
-        return result["answers"]
+        return {"answer_list":result["answers"],"score":result["score"]}
     return None
 
 async def set_score(session_id: str, score: float):

@@ -135,18 +135,19 @@ async def evaluate_score(session_id: str , current_user: dict = Depends(get_curr
     session = await get_interview_session_by_id(session_id=session_id)
     answers = await get_answers_by_session_id(session_id=session_id)
 
-     # Check if session and answers exist
-
+    # Check if session and answers exist
     if not session:
         return {"error": "Session not found"}
     
     if not answers:
         return {"error": "No answers found for this session"}
+     
+    # Prepare session details for evaluation
 
     QA_pairs = {}
 
     for idx, qtext in enumerate(session.questions, start=1):  # 1-based indexing
-        ans_obj = next((a for a in answers if a["question_id"] == idx), None)
+        ans_obj = next((a for a in answers['answer_list'] if a["question_id"] == idx), None)
         answer_text = ans_obj["answer_text"] if ans_obj else "Not answered"
         QA_pairs[qtext] = answer_text
 
@@ -159,7 +160,3 @@ async def evaluate_score(session_id: str , current_user: dict = Depends(get_curr
         return {"error": "Failed to update score in session"}
     
     return evaluation_data
-
-
-    
-
