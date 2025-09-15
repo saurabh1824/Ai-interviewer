@@ -1,4 +1,4 @@
-import {useEffect ,useState} from 'react';
+import {useEffect} from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
@@ -11,25 +11,20 @@ import { evaluateSession } from '../services/interview';
 const EvaluationPage = () => {
   const navigate = useNavigate();
   const { session ,setSession } = useSession();
-  const [callLimit, setCallLimit] = useState(0);
 
   useEffect(()=>{
     const fetchEvaluation= async ()=>{
       try{
-        const data=undefined;
-        if (callLimitReached <=1)
-        {
-          data=await evaluateSession(session.sessionId)
-          setCallLimit(callLimit + 1);
-        }
-    
-        // console.log("Evaluation data:", data);
+
+        const data=await evaluateSession(session.sessionId)
+        
         setSession({
           status: "completed",
           score: data.score,
           feedback: data.feedback || session.feedback,
           strengths: Array.isArray(data.strengths) && data.strengths.length > 0 ? data.strengths : session.strengths,
           areasForImprovement: Array.isArray(data.areas_for_improvement) && data.areas_for_improvement.length > 0 ? data.areas_for_improvement : session.areasForImprovement,
+          hasEvaluated: true,
           duration: data.duration || session.duration
         });
       }catch(err){
@@ -38,12 +33,12 @@ const EvaluationPage = () => {
     }
 
  
-    if (session.sessionId)
+    if (session.sessionId && !session.hasEvaluated)
     {
       fetchEvaluation();
     }
 
-},[session.sessionId]);
+},[session.sessionId , session.hasEvaluated]);
 
 useEffect(() => {
   console.log("Session in  evaluation block:", session);

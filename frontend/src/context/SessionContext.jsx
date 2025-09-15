@@ -12,6 +12,7 @@ const defaultSession = {
   feedback: "",
   strengths: [],
   areasForImprovement: [],
+  hasEvaluated: false,
   duration: "20 min "
 };
 

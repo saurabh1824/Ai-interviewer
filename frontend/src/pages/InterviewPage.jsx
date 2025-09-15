@@ -18,7 +18,7 @@ const InterviewPage = () => {
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentQuestionIndex ,setCurrentQuestionIndex]=useState(0)
   const navigate = useNavigate();
-  const { session,setSession } = useSession();
+  const { session,setSession ,clearSession } = useSession();
 
 
   const handleFormSubmit = async ({role , resume ,name}) => {
@@ -27,6 +27,7 @@ const InterviewPage = () => {
       setShowForm(false);
 
       const session = await startInterview(role,resume);
+      clearSession();   // resets everything including hasEvaluated
 
       // Store full session in context
       setSession({
