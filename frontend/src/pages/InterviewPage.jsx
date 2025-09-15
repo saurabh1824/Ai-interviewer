@@ -192,7 +192,8 @@ const handleEndInterview = async () => {
 
               {/* Right Panel - AI Interviewer */}
               <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-[calc(100vh-200px)]">
-                <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-100">
+                {/* Sticky Header */}
+                <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-100 sticky top-0 bg-white z-10">
                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold">AI</span>
                   </div>
