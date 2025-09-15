@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState ,useRef ,useEffect } from 'react';
 import { motion, AnimatePresence, analyseComplexValue } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
@@ -19,6 +19,13 @@ const InterviewPage = () => {
   const [currentQuestionIndex ,setCurrentQuestionIndex]=useState(0)
   const navigate = useNavigate();
   const { session,setSession ,clearSession } = useSession();
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
 
   const handleFormSubmit = async ({role , resume ,name}) => {
@@ -184,7 +191,7 @@ const handleEndInterview = async () => {
               </div>
 
               {/* Right Panel - AI Interviewer */}
-              <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+              <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-[calc(100vh-200px)]">
                 <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-100">
                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold">AI</span>
@@ -194,8 +201,9 @@ const handleEndInterview = async () => {
                     <p className="text-sm text-green-600">● Active</p>
                   </div>
                 </div>
-                
-                <div className="flex-1 overflow-y-auto space-y-4">
+
+                <div className="flex-1 overflow-y-auto space-y-4 pr-2 "
+                style={{ maxHeight: "60vh" }}>
                   {messages.map((msg, index) => (
                     <ChatBubble 
                       key={index} 
@@ -203,7 +211,8 @@ const handleEndInterview = async () => {
                       isTyping={msg.isTyping} 
                     />
                   ))}
-                </div>
+                  <div ref={messagesEndRef} /> {/* Invisible anchor */}
+                </div> 
               </div>
             </motion.div>
           )}
