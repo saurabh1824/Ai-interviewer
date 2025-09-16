@@ -15,6 +15,13 @@ async def transcribe_audio(file)->str:
         shutil.copyfileobj(file.file ,temp_file)
         temp_file_path = temp_file.name
 
-        result=model.transcribe(temp_file_path, language="en")
-        os.remove(temp_file_path) 
-        return result["text"]
+    
+    # Run Whisper AFTER file handle is closed
+    result = model.transcribe(temp_file_path, language="en")
+    # Now safe to remove
+    try:
+        os.remove(temp_file_path)
+    except PermissionError:
+        print(f"Warning: could not delete temp file {temp_file_path}")
+
+    return result["text"]
