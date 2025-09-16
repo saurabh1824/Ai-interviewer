@@ -58,3 +58,56 @@ backend/
   │   ├── db/           # CRUD ops (sessions, answers)
   │   ├── services/     # scoring, audio_handler, audio_answer
   │   └── core/         # config, settings
+```
+
+## ⚙️ Setup  
+
+### Backend  
+
+Clone the repo and create a virtual environment:  
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+### Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+### Start FastAPI server:
+```bash
+uvicorn app.main:app --reload
+```
+
+# Frontend
+
+### Install dependencies:
+```bash
+cd frontend
+npm install
+```
+
+### Start dev server:
+```bash
+npm run dev
+```
+
+## ▶️ Usage
+
+## Open http://localhost:5173 in browser.
+
+## Fill the form (name, role, resume).
+
+## Allow camera + mic access when prompted.
+
+## Answer questions in text or audio.
+
+## End the interview to see score + feedback.
+
+
+
+
+
+
