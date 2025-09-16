@@ -94,17 +94,18 @@ npm install
 npm run dev
 ```
 
-## ▶️ Usage
+### ▶️ Usage
 
-## Open http://localhost:5173 in browser.
+#### Open http://localhost:5173 in browser.
 
-## Fill the form (name, role, resume).
+#### Fill the form (name, role, resume).
 
-## Allow camera + mic access when prompted.
+#### Allow camera + mic access when prompted.
 
-## Answer questions in text or audio.
+#### Answer questions in text or audio.
 
-## End the interview to see score + feedback.
+#### End the interview to see score + feedback.
+
 
 
 
