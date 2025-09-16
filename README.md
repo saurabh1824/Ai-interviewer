@@ -26,6 +26,18 @@ It asks candidates questions, records their answers (text/audio), evaluates thei
 
 ---
 
+## Project Screenshots
+
+### Main Dashboard
+![Dashboard View](./screenshots/homepage.png)
+
+### Interview Session
+![Active Interview Screen](./screenshots/session1.png)
+
+### Feedback Report
+![Generated Feedback Report](./screenshots/evalautionpage.png)
+
+
 ## 🛠️ Tech Stack  
 
 ### Frontend  
