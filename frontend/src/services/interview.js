@@ -77,3 +77,14 @@ export async function evaluateSession(sessionId){
   return response.json()
   
 }
+
+export async function submitAudioAnswer(sessionId, formData)
+{
+  const response = await fetch(`${API_BASE}/interview/submit_answer_audio/${sessionId}`, {
+    method: "POST",
+    // headers: getAuthHeaders(false), // Don't set Content-Type for FormData
+    body: formData,
+  });
+  if (!response.ok) throw new Error("Failed to submit audio answer");
+  return response.json();
+}

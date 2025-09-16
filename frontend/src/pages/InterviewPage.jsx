@@ -9,7 +9,9 @@ import TextEditor from '../components/TextEditor';
 import Button from '../components/Button';
 import { useSession } from "../context/SessionContext";
 import { Mic, SkipForward, X, MessageSquare } from 'lucide-react';
-import { getNextQuestion, startInterview ,submitTextAnswer ,endSession } from "../services/interview";
+import { getNextQuestion, startInterview ,submitTextAnswer,submitAudioAnswer ,endSession } from "../services/interview";
+import { useAudioRecorder } from "../hooks/useAudioRecorder";
+import { useCamera } from "../hooks/useCamera";
 
 const InterviewPage = () => {
   const [showForm, setShowForm] = useState(true);
@@ -17,9 +19,23 @@ const InterviewPage = () => {
   const [messages, setMessages] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentQuestionIndex ,setCurrentQuestionIndex]=useState(0)
+  const { isRecording, audioBlob, startRecording, stopRecording,resetRecording } = useAudioRecorder();
+  const { videoRef, startCamera, stopCamera } = useCamera();
+  const [isCameraOn, setIsCameraOn] = useState(false);
   const navigate = useNavigate();
   const { session,setSession ,clearSession } = useSession();
   const messagesEndRef = useRef(null);
+
+  const handleToggleCamera = async () => {
+    if (isCameraOn) {
+      stopCamera();
+      setIsCameraOn(false);
+    } else {
+      await startCamera();
+      setIsCameraOn(true);
+    }
+  };
+
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -51,6 +67,9 @@ const InterviewPage = () => {
       setCurrentQuestionIndex(q.question_id)
       setMessages([{text:q.next_question ,isTyping:false}]);
       setShowForm(false);
+      // Start camera automatically
+      await startCamera();
+      setIsCameraOn(true);
 
 
       // You could also keep session_id in state/context
@@ -101,16 +120,19 @@ const InterviewPage = () => {
       "answer_type":"text",
       "answer_text":"QUESTION_NOT_ANSWERED"
     }
-    console.log(answerObj);
+    
     await submitTextAnswer(answerObj,session.sessionId)
     await fetchNext();
   };
 
 const handleEndInterview = async () => {
   try {
+    stopCamera(); // stop camera feed
     const response = await endSession(session.sessionId);
 
     if (response.message === "Session marked as completed") {
+      stopCamera(); // stop camera when session ends
+      setIsCameraOn(false);
       navigate('/evaluation');
     } else {
       alert(response.message);
@@ -147,16 +169,42 @@ const handleEndInterview = async () => {
             >
               {/* Left Panel - User Video & Controls */}
               <div className="space-y-6">
-                <VideoDisplay isMinimized={showTextEditor} />
+                <VideoDisplay
+                isMinimized={showTextEditor}
+                videoRef={videoRef}
+                isCameraOn={isCameraOn}
+                onToggleCamera={handleToggleCamera}
+                />
                 
                 <div className="flex justify-center space-x-4">
                   <Button
-                    variant="secondary"
-                    onClick={() => {/* Record audio logic */}}
+                    variant={isRecording ? "danger" : "secondary"}
+                    onClick={isRecording ? stopRecording : startRecording}
                     icon={<Mic className="h-4 w-4" />}
                   >
-                    Record Audio
+                    {isRecording ? "Stop Recording" : "Record Audio"}
                   </Button>
+
+                  {audioBlob && (
+                    <Button
+                      variant="primary"
+                      onClick={async () => {
+                        const formData = new FormData();
+                        formData.append("question_id", currentQuestionIndex);
+                        formData.append("audio_file", audioBlob, "answer.wav");
+
+                        try {
+                          await submitAudioAnswer(session.sessionId, formData);
+                          resetRecording();
+                          await fetchNext(); // move to next question
+                        } catch (err) {
+                          console.error("Upload failed:", err);
+                        }
+                      }}
+                    >
+                      Submit Answer
+                    </Button>
+                  )}
                   
                   <Button
                     variant="secondary"
