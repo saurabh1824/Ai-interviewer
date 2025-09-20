@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Core framework
 fastapi==0.116.1
 uvicorn==0.35.0
@@ -30,3 +31,6 @@ PyMuPDF==1.26.3
 # HTTP requests
 httpx==0.28.1
 requests==2.32.4
+=======
+
+>>>>>>> e3e04b51e888505901bd4cc26c5e91d3c23cba7c
