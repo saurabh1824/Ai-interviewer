@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, Depends
-from app.schemas.interview import interviewRequest,InterviewResponse
+from app.schemas.interview import InterviewResponse
 from app.db.models.answers import Answer
 from app.db.models.session import InterviewSessionModel
 from app.services import generate_content ,extract_text_from_pdf

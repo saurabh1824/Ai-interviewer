@@ -1,0 +1,32 @@
+# Core framework
+fastapi==0.116.1
+uvicorn==0.35.0
+starlette==0.47.2
+
+# Database
+motor==3.7.1       # Async driver for MongoDB
+pymongo==4.14.0    # Motor depends on this
+
+# Auth & Security
+python-jose==3.5.0
+passlib==1.7.4
+bcrypt==4.3.0
+python-multipart==0.0.20   # For form-data (file uploads)
+email_validator==2.2.0     # Used in user models (if validating email)
+
+# Environment
+python-dotenv==1.1.1
+pydantic==2.11.7
+pydantic-settings==2.10.1
+
+# AI / ML - CHANGE THIS LINE FOR SPEED
+torch==2.8.0+cpu --index-url https://download.pytorch.org/whl/cpu
+openai-whisper==20250625   # For audio transcription
+numpy==2.2.6               # Whisper/Torch dependency
+
+# PDF parsing
+PyMuPDF==1.26.3
+
+# HTTP requests
+httpx==0.28.1
+requests==2.32.4

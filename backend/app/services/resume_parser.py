@@ -13,6 +13,3 @@ async def extract_text_from_pdf(uploaded_file):
             text += page.get_text()
 
     return text
-
-
-# print(text)
